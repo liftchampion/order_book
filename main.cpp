@@ -12,7 +12,6 @@ int main()
 
 	cout << order_book << endl;
 
-
 	order_book[1231.2] = 333;
 	order_book[1231.2] = 33003;
 	order_book[121.2] = 33663;
@@ -21,8 +20,5 @@ int main()
 	order_book[100.2] = 331243;
 
 	cout << order_book << endl;
-
-
-
 	return 0;
 }
