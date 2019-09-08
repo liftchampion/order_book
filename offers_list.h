@@ -22,8 +22,7 @@ private:
 public:
 
 	template <typename A>
-	class Offer {
-	public:
+	struct Offer {
 		Offer(double price, A amount) : price(price), amount(amount) {}
 		double	price = 0;
 		A		amount;
@@ -38,6 +37,8 @@ public:
 		iterator operator++(int junk);
 		Offer<int&> operator*();
 		Offer<int&>* operator->();
+		bool operator==(const iterator& other);
+		bool operator!=(const iterator& other);
 	private:
 		int 		*begin;
 		int 		*end;
@@ -52,6 +53,7 @@ public:
 	int operator[](double price) const;
 	int& operator[](double price);
 	iterator begin();
+	iterator end();
 //	const_iterator begin() const{
 //		return const_iterator(offers.data(), offers.data(), offset, step);
 //	}
@@ -61,8 +63,8 @@ public:
 	double get_step() const;
 private:
 	std::vector<int>	offers;
-	double			offset;
-	double			step;
+	double				offset;
+	double				step;
 };
 
 std::ostream& operator<<(std::ostream& os, const OffersList& order_book);

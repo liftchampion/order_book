@@ -12,7 +12,6 @@
 
 #include <iostream>
 #include <vector>
-#include <utility>
 #include <cmath>
 #include <limits>
 #include "offers_list.h"
@@ -20,13 +19,13 @@
 using namespace std;
 
 void OffersList::check_price(double price, const string& where) const {
-	if (price - offset <= -numeric_limits<double>::epsilon()) {
+	if (price - offset <= -numeric_limits<double>::epsilon() * offset) {
 		throw domain_error(
 				"Price should be greater or equal than offset (" + where + ")");
 	}
 	double quotient = price / step;
-	if (fabs(quotient - static_cast<int>(quotient)) >=
-		numeric_limits<double>::epsilon()) {
+	if (fabs(quotient - rint(quotient)) >=
+		numeric_limits<double>::epsilon() * quotient) {
 		throw domain_error(
 				"Price should be multiply of step (" + where + ")");
 	}
@@ -52,8 +51,22 @@ int& OffersList::operator[](double price){
 	}
 	return offers[idx];
 }
+
 OffersList::iterator OffersList::begin() {
-	return iterator(offers.data(), offers.data() + offers.size(), offers.data(), offset, step);
+	int	*begin_ptr = offers.data();
+	int	*end = offers.data() + offers.size();
+
+	while (begin_ptr != end && !*begin_ptr) {
+		++begin_ptr;
+	}
+	return iterator(
+			offers.data(), end, begin_ptr, offset, step);
+}
+
+OffersList::iterator OffersList::end() {
+	return iterator(
+			offers.data(), offers.data() + offers.size(),
+			offers.data() + offers.size(), offset, step);
 }
 
 const vector<int>& OffersList::get_offers() const{

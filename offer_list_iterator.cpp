@@ -52,3 +52,11 @@ OffersList::Offer<int&>* OffersList::iterator::operator->() {
 	_offer_ptr = new Offer<int&>(distance * step + offset, *ptr);
 	return _offer_ptr;
 }
+
+bool OffersList::iterator::operator==(const OffersList::iterator& other) {
+	return this->ptr == other.ptr;
+}
+
+bool OffersList::iterator::operator!=(const OffersList::iterator& other) {
+	return this->ptr != other.ptr;
+}
