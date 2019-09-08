@@ -69,22 +69,14 @@ OffersList::iterator OffersList::end() {
 			offers.data() + offers.size(), offset, step);
 }
 
-const vector<int>& OffersList::get_offers() const{
-	return offers;
-}
-double OffersList::get_offset() const{
-	return offset;
-}
-double OffersList::get_step() const{
-	return step;
-}
-
-ostream& operator<<(ostream& os, const OffersList& order_book){
-	double step = order_book.get_step();
-	double offset = order_book.get_offset();
-	const auto& offers = order_book.get_offers();
-	for (size_t i = 0; i < offers.size(); ++i) {
-		cout << offset + step * i << " | " << offers[i] << endl;
+// Чтобы можно было передать offers_list по константной ссылке, необходимо реализовать
+// const_iterator, реализация которого ничем не отличается от обычного кроме константности
+ostream& operator<<(ostream& os, OffersList& offers_list){
+	bool is_first = true;
+	for (auto [price, amount] : offers_list) {
+		if (!is_first) { cout << endl; }
+		if (is_first) { is_first = false; }
+		cout << price << " | " << amount;
 	}
 	return os;
 }

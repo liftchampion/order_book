@@ -48,23 +48,16 @@ public:
 		Offer<int&>	*_offer_ptr = nullptr;
 	};
 
-
 	explicit OffersList(double offset, double step = 0.1);
 	int operator[](double price) const;
 	int& operator[](double price);
 	iterator begin();
 	iterator end();
-//	const_iterator begin() const{
-//		return const_iterator(offers.data(), offers.data(), offset, step);
-//	}
 
-	const std::vector<int>& get_offers() const;
-	double get_offset() const;
-	double get_step() const;
 private:
 	std::vector<int>	offers;
 	double				offset;
 	double				step;
 };
 
-std::ostream& operator<<(std::ostream& os, const OffersList& order_book);
+std::ostream& operator<<(std::ostream& os, OffersList& offers_list);
