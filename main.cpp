@@ -22,6 +22,8 @@ int main()
 
 	bg++;
 	bg->amount = 11;
+	bg++;
+	//bg->amount = 20;
 	cout << order_book << endl << endl;
 
 	return 0;
