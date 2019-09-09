@@ -34,6 +34,10 @@ public:
 	explicit OffersList() = default;
 	int			operator[](double price) const;
 	int&		operator[](double price);
+	int			at(double price) const;
+	int&		at(double price);
+	iterator	find(double price);
+	// todo const_find
 	void		rebuild();
 	bool 		set_offset(double new_offset);
 	bool 		set_step(double new_step);
@@ -56,6 +60,7 @@ public:
 	{
 	public:
 		iterator(lst_iter *ptr, lst_iter *end, lst_iter lst_end);
+		iterator&	operator=(const iterator& other) = delete;
 		iterator	operator++();
 		iterator	operator++(int junk);
 		Offer		operator*() const;
@@ -70,10 +75,10 @@ public:
 		const lst_iter	lst_end;
 	};
 private:
-	inline std::array<bool, 3>	subscript_helper(double price) const;
+	std::array<bool, 3>			subscript_helper(double price) const;
 	std::pair<double, double>	find_min_step_offset_and_rm_empty(lst_iter no_del_iter);
 	void 						rebuild_(lst_iter no_del_if_empty);
-	inline bool					need_rebuild(double price) const;
+	bool						need_rebuild(double price) const;
 	bool						check_price_by_step(double price) const;
 	size_t						get_idx_by_price(double price) const;
 	static double				get_step_by_price(double price);

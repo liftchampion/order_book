@@ -41,7 +41,7 @@ double		OffersList::get_step_by_price(double price){
 	ss << fixed << setprecision(PRECISION) << price;
 	string		number_str(ss.str());
 	const int	decimal_point_pos =
-					find(number_str.begin(), number_str.end(), '.') - number_str.begin();
+					std::find(number_str.begin(), number_str.end(), '.') - number_str.begin();
 	int			first_digit_after_point =
 					last_digit_after_decimal_point(string_view(number_str).substr(
 								  decimal_point_pos + 1));

@@ -15,7 +15,7 @@
 
 using namespace std;
 
-bool 		OffersList::set_offset(double new_offset) {
+bool 					OffersList::set_offset(double new_offset) {
 	if (offset != INIT_VAL) {
 		return false;
 	}
@@ -23,7 +23,7 @@ bool 		OffersList::set_offset(double new_offset) {
 	return true;
 }
 
-bool 		OffersList::set_step(double new_step) {
+bool 					OffersList::set_step(double new_step) {
 	if (step != INIT_VAL) {
 		return false;
 	}
@@ -31,23 +31,33 @@ bool 		OffersList::set_step(double new_step) {
 	return true;
 }
 
-bool		OffersList::empty() const {
+bool					OffersList::empty() const {
 	return idx_to_offer_iter.empty();
 }
 
-void		OffersList::clear() {
+void					OffersList::clear() {
 	idx_to_offer_iter.clear();
 	offers_list.clear();
 	offset = INIT_VAL;
 	step = INIT_VAL;
 }
 
-void		OffersList::shrink_to_fit() {
+void					OffersList::shrink_to_fit() {
 	rebuild();
 	idx_to_offer_iter.shrink_to_fit();
 }
 
-OffersList::iterator OffersList::begin(){
+OffersList::iterator	OffersList::find(double price){
+	const auto [can_fit, fit, present] = subscript_helper(price);
+	if (!present) {
+		return end();
+	}
+	return iterator(idx_to_offer_iter.data() + get_idx_by_price(price),
+					idx_to_offer_iter.data() + idx_to_offer_iter.size(),
+					offers_list.end());
+}
+
+OffersList::iterator	OffersList::begin(){
 	lst_iter *begin_ptr = idx_to_offer_iter.data();
 	lst_iter *end_ptr = begin_ptr + idx_to_offer_iter.size();
 
@@ -58,7 +68,7 @@ OffersList::iterator OffersList::begin(){
 	return iterator(begin_ptr, end_ptr, offers_list.end());
 }
 
-OffersList::iterator OffersList::end(){
+OffersList::iterator	OffersList::end(){
 	return iterator(idx_to_offer_iter.data() + idx_to_offer_iter.size(),
 					idx_to_offer_iter.data() + idx_to_offer_iter.size(),
 					offers_list.end());
@@ -66,7 +76,7 @@ OffersList::iterator OffersList::end(){
 
 // Чтобы можно было передать offers_list по константной ссылке, необходимо реализовать
 // const_iterator, реализация которого ничем не отличается от обычного кроме константности
-ostream& operator<<(ostream& os, OffersList& offers_list){
+ostream&				operator<<(ostream& os, OffersList& offers_list){
 	bool is_first = true;
 	for (auto [price, amount] : offers_list) {
 		if (!is_first) { cout << endl; }

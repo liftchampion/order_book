@@ -38,7 +38,23 @@ int&					OffersList::operator[](double price){
 	return idx_to_offer_iter[get_idx_by_price(price)]->offer.amount;
 }
 
-inline array<bool, 3>	OffersList::subscript_helper(double price) const {
+int						OffersList::at(double price) const {
+	const auto [can_fit, fit, present] = subscript_helper(price);
+	if (!present) {
+		throw out_of_range("Specified price not found at OffersList");
+	}
+	return idx_to_offer_iter[get_idx_by_price(price)]->offer.amount;
+}
+
+int&					OffersList::at(double price){
+	const auto [can_fit, fit, present] = subscript_helper(price);
+	if (!present) {
+		throw out_of_range("Specified price not found at OffersList");
+	}
+	return idx_to_offer_iter[get_idx_by_price(price)]->offer.amount;
+}
+
+array<bool, 3>			OffersList::subscript_helper(double price) const {
 	if (!isfinite(price)) {
 		throw domain_error("Price shouldn't be ±inf or NaN");
 	}
@@ -50,7 +66,7 @@ inline array<bool, 3>	OffersList::subscript_helper(double price) const {
 	return {{can_fit, fit, present}};
 }
 
-inline bool				OffersList::need_rebuild(double price) const {
+bool					OffersList::need_rebuild(double price) const {
 	if (offset == INIT_VAL || step == INIT_VAL) {
 		return true;
 	}

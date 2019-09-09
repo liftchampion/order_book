@@ -38,33 +38,24 @@ int main()
 	offers_list[64.42] = 1;
 	offers_list[50] = 11;
 
-	offers_list[1231.2] = 333;
-	offers_list[1231.2] = 33003;
 	offers_list[121.2] = 33663;
 	offers_list[131.2] = 33993;
-	offers_list[1266631.2] = 33333;
 	offers_list[100.2] = 331243;
 
 
-	cout << offers_list << endl;
+	cout << offers_list << endl << endl;
 
-	offers_list[1266631.2] = 0;
 
-	offers_list.shrink_to_fit();
+	auto ff = offers_list.find(100.2);
 
-	cout << offers_list << endl;
+	ff->amount = 8;
 
-	cout << offers_list.empty() << endl;
-	cout << offers_list.set_offset(10) << endl;
+	if (offers_list.find(1337) != offers_list.end())
+		offers_list.at(1337) = 100;
 
-	offers_list.clear();
-
-	cout << offers_list.empty() << endl;
-	cout << offers_list.set_offset(10) << endl;
-
-	offers_list[10] = 100;
 
 	cout << offers_list << endl;
+
 
 	return 0;
 }
