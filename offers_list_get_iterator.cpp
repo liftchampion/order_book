@@ -70,6 +70,14 @@ OffersList::const_iterator	OffersList::end() const{
 						  offers_list.end());
 }
 
+OffersList::const_iterator	OffersList::cbegin() const {
+	return begin();
+}
+
+OffersList::const_iterator	OffersList::cend() const{
+	return end();
+}
+
 OffersList::reverse_iterator		OffersList::rbegin(){
 	lst_iter *begin_ptr = idx_to_offer_iter.data() + idx_to_offer_iter.size() - 1;
 	lst_iter *end_ptr = idx_to_offer_iter.data() - 1;
@@ -108,4 +116,12 @@ OffersList::const_reverse_iterator	OffersList::rend() const{
 						  idx_to_offer_iter.data() - 1,
 						  idx_to_offer_iter.data() + idx_to_offer_iter.size(),
 						  offers_list.end());
+}
+
+OffersList::const_reverse_iterator	OffersList::crbegin() const {
+	return rbegin();
+}
+
+OffersList::const_reverse_iterator	OffersList::crend() const{
+	return rend();
 }

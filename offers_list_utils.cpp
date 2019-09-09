@@ -13,6 +13,7 @@
 #include <iostream>
 #include "offers_list_class.h"
 #include "offers_list_iterators.h"
+#include "reverser.h"
 
 using namespace std;
 
@@ -52,7 +53,7 @@ void		OffersList::shrink_to_fit() {
 // const_iterator, реализация которого ничем не отличается от обычного кроме константности
 ostream&					operator<<(ostream& os, const OffersList& offers_list){
 	bool is_first = true;
-	for (auto [price, amount] : offers_list) {
+	for (auto [price, amount] : reverse(offers_list)) {
 		if (!is_first) { cout << endl; }
 		if (is_first) { is_first = false; }
 		cout << fixed << price << " | " << amount;
