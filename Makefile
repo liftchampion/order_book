@@ -2,7 +2,7 @@ NAME = order_book
 SRC = $(wildcard *.cpp)
 OBJ=$(SRC:.cpp=.o)
 CC = g++
-CFLAGS = --std=c++1z -Wall -Wextra
+CFLAGS = --std=c++1z -Wall -Wextra -O3
 HDR = offers_list.h
 
 all: $(NAME)
