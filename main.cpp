@@ -35,6 +35,17 @@ void benchmark_insert(
 		}
 	}
 	{
+		LOG_DURATION(to_string(ops_count) + " Inserts. " + msg + " (Vector preset)", ops_count)
+		OffersList offers_list;
+		offers_list.set_offset(int_part_min);
+		offers_list.set_step(1. / decimal_part_max);
+		for (int i = 0; i < ops_count; ++i){
+			offers_list[dist_int_part(gen) +
+						static_cast<double>(dist_decimal_part(gen)) /
+						decimal_part_max] = dist_amount(gen);
+		}
+	}
+	{
 		LOG_DURATION(to_string(ops_count) + " Inserts. " + msg + " (Map)", ops_count)
 		OffersListMap offers_list;
 		for (int i = 0; i < ops_count; ++i){
@@ -248,7 +259,7 @@ void benchmark_miss_step(
 						static_cast<double>(dist_decimal_part(gen)) /
 						decimal_part_max] = dist_amount(gen);
 		}
-		LOG_DURATION(to_string(ops_count) + "inserts. Miss step. " + msg + " (Vector)", ops_count)
+		LOG_DURATION(to_string(ops_count) + " inserts. Miss step. " + msg + " (Vector)", ops_count)
 		offers_list[int_part_min + 0.1 / decimal_part_max] = 1337;
 	}
 	{
@@ -258,7 +269,7 @@ void benchmark_miss_step(
 						static_cast<double>(dist_decimal_part(gen)) /
 						decimal_part_max] = dist_amount(gen);
 		}
-		LOG_DURATION(to_string(ops_count) + "inserts. Miss step. " + msg + " (Map)", ops_count)
+		LOG_DURATION(to_string(ops_count) + " inserts. Miss step. " + msg + " (Map)", ops_count)
 		offers_list[int_part_min + 0.1 / decimal_part_max] = 1337;
 	}
 }
