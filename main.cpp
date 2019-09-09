@@ -20,6 +20,20 @@ int main()
 
 	offers_list[1.45] = 1;
 
+	offers_list[1000.457] = 99;
+
+	offers_list[1.45] = 0;
+	offers_list[1000.457] = 0;
+
+	offers_list[0] = 7;
+	offers_list[61.20] = 0;
+	offers_list[0] = 0;
+	offers_list[64.4] = 0;
+
+	offers_list.rebuild();
+
+	//offers_list[-1] = 0;
+
 	cout << offers_list << endl;
 
 //	cout << offers_list << endl;

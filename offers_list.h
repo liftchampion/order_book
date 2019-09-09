@@ -51,10 +51,11 @@ public:
 	};
 public:
 	explicit OffersList() = default;
-	int operator[](double price) const;
-	int& operator[](double price);
-	iterator begin();
-	iterator end();
+	int			operator[](double price) const;
+	int&		operator[](double price);
+	iterator	begin();
+	iterator	end();
+	void		rebuild();
 private:
 	inline auto					subscript_helper(double price) const;
 	std::pair<double, double>	find_min_step_offset_and_rm_empty(lst_iter no_del_iter);
@@ -66,8 +67,8 @@ private:
 	static int					last_digit_before_decimal_point(std::string_view number_str);
 	static int					last_digit_after_decimal_point(std::string_view number_str);
 private:
-	std::forward_list<OfferData> offers_list;        // todo!!!
-	std::vector<lst_iter>        idx_to_offer_iter; // todo!!!
+	std::forward_list<OfferData> offers_list;
+	std::vector<lst_iter>        idx_to_offer_iter;
 	double                       offset = INIT_VAL;
 	double                       step = INIT_VAL;
 	constexpr static double      INIT_VAL = -std::numeric_limits<double>::infinity();
