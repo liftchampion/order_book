@@ -10,11 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-using namespace std;
-
 #include "offers_list.h"
 
-OffersList::Offer::Offer(double price, double step) :
-	price(price),
+using namespace std;
+
+OffersList::Offer::Offer(double price) : price(price)
+{}
+
+OffersList::OfferData::OfferData(double price, double step) :
+	offer(price),
 	step(step)
 {}

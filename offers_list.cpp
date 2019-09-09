@@ -18,6 +18,8 @@
 #include <sstream>
 #include <string_view>
 #include <iomanip>
+#include <tuple>
+#include <array>
 
 using namespace std;
 
@@ -67,11 +69,11 @@ pair<double, double> OffersList::find_min_step_offset_and_rm_empty(lst_iter no_d
 	lst_iter	curr_it;
 
 	for (auto it = offers_list.before_begin(); next(it) != offers_list.end();) {
-		if ((curr_it = next(it)) != no_del_iter && curr_it->amount == 0) {
+		if ((curr_it = next(it)) != no_del_iter && curr_it->offer.amount == 0) {
 			offers_list.erase_after(it);
 		} else {
-			if (min_offset > curr_it->price) { min_offset = curr_it->price; }
-			if (min_step   > curr_it->step ) { min_step   = curr_it->step; }
+			if (min_offset > curr_it->offer.price) { min_offset = curr_it->offer.price; }
+			if (min_step   > curr_it->step ) { min_step = curr_it->step; }
 			++it;
 		}
 	}
@@ -79,18 +81,18 @@ pair<double, double> OffersList::find_min_step_offset_and_rm_empty(lst_iter no_d
 }
 
 void OffersList::rebuild_(lst_iter no_del_if_empty) {
-	const auto new_offset_step = find_min_step_offset_and_rm_empty(no_del_if_empty);
+	const auto [new_offset, new_step] = find_min_step_offset_and_rm_empty(no_del_if_empty);
 	if (offers_list.empty()) {
 		offset = INIT_VAL;
 		step   = INIT_VAL;
 		return;
 	}
-	offset = new_offset_step.first;
-	step   = new_offset_step.second;
-	int idx;
+	offset = new_offset;
+	step   = new_step;
+	size_t idx;
 	idx_to_offer_iter.clear();
 	for (auto offer_it = offers_list.begin(); offer_it != offers_list.end(); ++offer_it ) {
-		if ((idx = get_idx_by_price(offer_it->price)) >= idx_to_offer_iter.size()) {
+		if ((idx = get_idx_by_price(offer_it->offer.price)) >= idx_to_offer_iter.size()) {
 			idx_to_offer_iter.resize(idx + 1, offers_list.end());
 		}
 		idx_to_offer_iter[idx] = offer_it;
@@ -103,75 +105,72 @@ inline bool OffersList::check_price_by_step(double price) const {
 }
 
 inline bool		OffersList::need_rebuild(double price) const {
-
-	if (offset != INIT_VAL && offset - price >= EPSILON) {
+	if (offset == INIT_VAL || step == INIT_VAL) {
 		return true;
 	}
-	if (step != INIT_VAL && !check_price_by_step(price)) {
+	if (offset - price >= EPSILON) {
+		return true;
+	}
+	if (!check_price_by_step(price)) {
 		return true;
 	}
 	return false;
 }
 
-inline void OffersList::subscript_helper(double price, bool& can_fit, bool& present) const {
+inline auto OffersList::subscript_helper(double price) const {
 	if (!isfinite(price)) {
 		throw domain_error("Price shouldn't be ±inf or NaN");
 	}
-	int	 idx;
-	bool fit;
+	size_t	idx;
 
-	can_fit = !need_rebuild(price);
-	fit     = can_fit ? (idx = get_idx_by_price(price)) < idx_to_offer_iter.size() : false;
-	present = fit ? idx_to_offer_iter[idx] != offers_list.end() : false;
+	bool can_fit = !need_rebuild(price);
+	bool fit     = can_fit ? (idx = get_idx_by_price(price)) < idx_to_offer_iter.size() : false;
+	bool present = fit ? idx_to_offer_iter[idx] != offers_list.end() : false;
+	return array<bool, 3>{can_fit, fit, present};
 }
 
 int OffersList::operator[](double price) const {
-	bool can_fit;
-	bool present;
+	const auto [can_fit, fit, present] = subscript_helper(price);
 
-	subscript_helper(price, can_fit, present);
-
-	return present ? idx_to_offer_iter[get_idx_by_price(price)]->amount : 0;
+	return present ? idx_to_offer_iter[get_idx_by_price(price)]->offer.amount : 0;
 }
 int& OffersList::operator[](double price){
-	bool can_fit;
-	bool present;
+	const auto [can_fit, fit, present] = subscript_helper(price);
 
-	subscript_helper(price, can_fit, present);
 	if (!present) {
 		offers_list.emplace_front(price, get_step_by_price(price));
 		if (!can_fit) {
 			rebuild_(offers_list.begin());
+		} else {
+			if (!fit) {
+				idx_to_offer_iter.resize(get_idx_by_price(price) + 1, offers_list.end());
+			}
+			idx_to_offer_iter[get_idx_by_price(price)] = offers_list.begin();
 		}
 	}
-	return idx_to_offer_iter[get_idx_by_price(price)]->amount;
+	return idx_to_offer_iter[get_idx_by_price(price)]->offer.amount;
 }
 
-//OffersList::iterator OffersList::begin() {
-//	int	*begin_ptr = idx_to_offer_iter.data();
-//	int	*end = idx_to_offer_iter.data() + idx_to_offer_iter.size();
-//
-//	while (begin_ptr != end && !*begin_ptr) {
-//		++begin_ptr;
-//	}
-//	return iterator(
-//			idx_to_offer_iter.data(), end, begin_ptr, offset, step);
-//}
-//
-//OffersList::iterator OffersList::end() {
-//	return iterator(
-//			idx_to_offer_iter.data(), idx_to_offer_iter.data() + idx_to_offer_iter.size(),
-//			idx_to_offer_iter.data() + idx_to_offer_iter.size(), offset, step);
-//}
+OffersList::iterator OffersList::begin() {
+	return iterator(idx_to_offer_iter.data(),
+			    idx_to_offer_iter.data() + idx_to_offer_iter.size(),
+				    offers_list.end());
+}
+
+OffersList::iterator OffersList::end() {
+	return iterator(idx_to_offer_iter.data() + idx_to_offer_iter.size(),
+				    idx_to_offer_iter.data() + idx_to_offer_iter.size(),
+					offers_list.end());
+}
 
 // Чтобы можно было передать offers_list по константной ссылке, необходимо реализовать
 // const_iterator, реализация которого ничем не отличается от обычного кроме константности
-//ostream& operator<<(ostream& os, OffersList& offers_list){
-//	bool is_first = true;
-//	for (auto [price, amount] : offers_list) {
-//		if (!is_first) { cout << endl; }
-//		if (is_first) { is_first = false; }
-//		cout << price << " | " << amount;
-//	}
-//	return os;
-//}
+ostream& operator<<(ostream& os, OffersList& offers_list){
+	bool is_first = true;
+	for (auto [price, amount] : offers_list) {
+		if (!is_first) { cout << endl; }
+		if (is_first) { is_first = false; }
+		cout << price << " | " << amount;
+	}
+	return os;
+}

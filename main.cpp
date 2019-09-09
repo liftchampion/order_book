@@ -5,10 +5,22 @@ using namespace std;
 
 int main()
 {
-//	OffersList offers_list(60, 0.1);
+
+	OffersList offers_list;
 //	cout << offers_list << endl;
 
-//	offers_list[61.20] = 20000;
+	offers_list[61.20] = 20000;
+
+	offers_list[64.4] = 1;
+
+	auto gg = offers_list.begin();
+	++gg;
+
+	gg->amount = 101;
+
+	offers_list[1.45] = 1;
+
+	cout << offers_list << endl;
 
 //	cout << offers_list << endl;
 
@@ -18,11 +30,6 @@ int main()
 //	offers_list[131.2] = 33993;
 //	offers_list[1266631.2] = 33333;
 //	offers_list[100.2] = 331243;
-
-	std::forward_list<int>						offers_list;
-	std::vector<decltype(offers_list.begin())>	idx_to_offer_iter;
-
-	idx_to_offer_iter.resize(100, offers_list.end()); // todo important!
 
 	//cout << OffersList::get_step_by_price(-10060000) << endl;
 

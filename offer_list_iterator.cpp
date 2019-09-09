@@ -12,51 +12,39 @@
 
 #include "offers_list.h"
 
-//OffersList::iterator::iterator(int *begin, int *end, int *ptr, double offset, double step):
-//		begin(begin), end(end), ptr(ptr), offset(offset), step(step)
-//{}
-//
-//OffersList::iterator::~iterator() {
-//	if (_offer_ptr != nullptr) { delete(_offer_ptr); }
-//	_offer_ptr = nullptr;
-//}
-//
-//OffersList::iterator OffersList::iterator::operator++() {
-//	++ptr;
-//	while (ptr < end && !*ptr) {
-//		++ptr;
-//	}
-//	return OffersList::iterator(
-//			this->begin, this->end, this->ptr, this->offset, this->step);
-//}
-//
-//OffersList::iterator OffersList::iterator::operator++(int junk) {
-//	iterator iter = OffersList::iterator(
-//			this->begin, this->end, this->ptr, this->offset, this->step);
-//	++ptr;
-//	while (ptr < end && !*ptr) {
-//		++ptr;
-//	}
-//	return iter;
-//}
-//
-//OffersList::Offer<int&> OffersList::iterator::operator*() {
-//	int distance = static_cast<int>(ptr - begin);
-//	return {distance * step + offset, *ptr};
-//}
-//
-//OffersList::Offer<int&>* OffersList::iterator::operator->() {
-//	int distance = static_cast<int>(ptr - begin);
-//
-//	if (_offer_ptr != nullptr) { delete(_offer_ptr); }
-//	_offer_ptr = new Offer<int&>(distance * step + offset, *ptr);
-//	return _offer_ptr;
-//}
-//
-//bool OffersList::iterator::operator==(const OffersList::iterator& other) {
-//	return this->ptr == other.ptr;
-//}
-//
-//bool OffersList::iterator::operator!=(const OffersList::iterator& other) {
-//	return this->ptr != other.ptr;
-//}
+OffersList::iterator::iterator(lst_iter *ptr, lst_iter *end, lst_iter lst_end) :
+		ptr(ptr), end(end), lst_end(lst_end)
+{}
+
+void					OffersList::iterator::next(){
+	++ptr;
+	while (ptr < end && (*ptr == lst_end || !(*ptr)->offer.amount)) {
+		++ptr;
+	}
+}
+OffersList::iterator	OffersList::iterator::operator++() {
+	next();
+	return *this;
+}
+
+OffersList::iterator	OffersList::iterator::operator++(int junk) {
+	iterator ret = *this;
+	next();
+	return ret;
+}
+
+OffersList::Offer		OffersList::iterator::operator*() const{
+	return (*ptr)->offer;
+}
+
+OffersList::Offer*		OffersList::iterator::operator->() const{
+	return &(*ptr)->offer;
+}
+
+bool					OffersList::iterator::operator==(const OffersList::iterator& other) const {
+	return this->ptr == other.ptr;
+}
+
+bool					OffersList::iterator::operator!=(const OffersList::iterator& other) const {
+	return this->ptr != other.ptr;
+}

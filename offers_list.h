@@ -23,59 +23,40 @@
 
 class OffersList {
 public:
-
 	struct Offer {
-	public:
-		Offer(double price, double step);
-		double	price;
-		int		amount = 0;
-	private:
-		const double step;
-		friend class OffersList;
+		explicit Offer(double price);
+		const double	price;
+		int				amount = 0;
 	};
-
-///	struct OfferData {
-///		double											step = 1;
-///		decltype(std::forward_list<Offer>().begin())	offer_it;
-///	};
-
-//	class iterator : public std::iterator<std::bidirectional_iterator_tag, const Offer<int&>>
-//	{
-//	public:
-//		iterator(int *begin, int *end, int *ptr, double offset, double step);
-//		~iterator();
-//		iterator operator++();
-//		iterator operator++(int junk);
-//		Offer<int&> operator*();
-//		Offer<int&>* operator->();
-//		bool operator==(const iterator& other);
-//		bool operator!=(const iterator& other);
-//	private:
-//		int 		*begin;
-//		int 		*end;
-//		int			*ptr;
-//		double		offset;
-//		double		step;
-//		Offer<int&>	*_offer_ptr = nullptr;
-//	};
-
+private:
+	struct OfferData;
+	using lst_iter = decltype(std::forward_list<OfferData>().begin());
+public:
+	class iterator : public std::iterator<std::bidirectional_iterator_tag, OfferData>
+	{
+	public:
+		iterator(lst_iter *ptr, lst_iter *end, lst_iter lst_end);
+		iterator	operator++();
+		iterator	operator++(int junk);
+		Offer		operator*() const;
+		Offer*		operator->() const;
+		bool		operator==(const iterator& other) const;
+		bool		operator!=(const iterator& other) const;
+	private:
+		void		next();
+	private:
+		lst_iter		*ptr;
+		const lst_iter	lst_end;
+		const lst_iter	*end;
+	};
+public:
 	explicit OffersList() = default;
 	int operator[](double price) const;
 	int& operator[](double price);
-//	iterator begin();
-//	iterator end();
+	iterator begin();
+	iterator end();
 private:
-	std::forward_list<Offer>					offers_list;
-	using lst_iter = decltype(offers_list.begin());
-	std::vector<lst_iter>	idx_to_offer_iter;
-	double           							offset = INIT_VAL;
-	double           							step = INIT_VAL;
-	constexpr static double						INIT_VAL = -std::numeric_limits<double>::infinity();
-	constexpr static int						PRECISION = 6;
-	const double								EPSILON = pow(0.1, PRECISION);
-private:
-	inline void					subscript_helper(double price, bool& can_fit, bool& present) const;
-	void						check_and_rebuild_if_needed(double price);
+	inline auto					subscript_helper(double price) const;
 	std::pair<double, double>	find_min_step_offset_and_rm_empty(lst_iter no_del_iter);
 	void 						rebuild_(lst_iter no_del_if_empty);
 	inline bool					need_rebuild(double price) const;
@@ -84,6 +65,23 @@ private:
 	static double				get_step_by_price(double price);
 	static int					last_digit_before_decimal_point(std::string_view number_str);
 	static int					last_digit_after_decimal_point(std::string_view number_str);
+private:
+	std::forward_list<OfferData> offers_list;        // todo!!!
+	std::vector<lst_iter>        idx_to_offer_iter; // todo!!!
+	double                       offset = INIT_VAL;
+	double                       step = INIT_VAL;
+	constexpr static double      INIT_VAL = -std::numeric_limits<double>::infinity();
+	constexpr static int         PRECISION = 6;
+	const double                 EPSILON = pow(0.1, PRECISION);
+private:
+	struct OfferData {
+	public:
+		OfferData(double price, double step);
+		Offer		offer;
+	private:
+		const double step;
+		friend class OffersList;
+	};
 };
 
 std::ostream& operator<<(std::ostream& os, OffersList& offers_list);
