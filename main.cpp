@@ -1,9 +1,9 @@
 #include <iostream>
 #include "offers_list.h"
 #include "profile.h"
-#include <limits>
 #include <random>
 #include <string>
+#include "map_version.h"
 
 using namespace std;
 
@@ -25,20 +25,28 @@ void benchmark(
 
 
 	{
-		LOG_DURATION(msg)
+		LOG_DURATION(msg + " (Vector)")
 		OffersList offers_list;
 		for (int i = 0; i < tests_count; ++i){
 			offers_list[dist_int_part(gen) +
 						static_cast<double>(dist_decimal_part(gen)) /
 						decimal_part_max] = dist_amount(gen);
 		}
-		cout << offers_list << endl;
+	}
+	{
+		LOG_DURATION(msg + " (Map)")
+		OffersListMap offers_list;
+		for (int i = 0; i < tests_count; ++i){
+			offers_list[dist_int_part(gen) +
+						static_cast<double>(dist_decimal_part(gen)) /
+						decimal_part_max] = dist_amount(gen);
+		}
 	}
 }
 
 
 int		main()
 {
-	benchmark(0,100,0,10,0,1000, 1000, "hui");
+	benchmark(0,100,0,10,0,1000, 1000000, "hui");
 	return 0;
 }
