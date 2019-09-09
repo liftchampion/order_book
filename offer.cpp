@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "offers_list.h"
+#include "offers_list_class.h"
 
 using namespace std;
 

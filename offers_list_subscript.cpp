@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "offers_list.h"
+#include "offers_list_class.h"
 #include <array>
 #include <exception>
 

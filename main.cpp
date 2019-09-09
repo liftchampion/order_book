@@ -1,10 +1,16 @@
 #include <iostream>
 #include "offers_list.h"
 
+#include <map>
+
 using namespace std;
 
 int main()
 {
+
+	map<int, string> qq;
+
+	auto ss = qq.begin();
 
 	OffersList offers_list;
 //	cout << offers_list << endl;
@@ -54,7 +60,21 @@ int main()
 		offers_list.at(1337) = 100;
 
 
-	cout << offers_list << endl;
+	cout << offers_list << endl << "Check reverse" << endl;
+
+	for (auto it = offers_list.rbegin(); it != offers_list.rend(); ++it) {
+		cout << it->price << endl;
+	}
+	cout << endl;
+
+	auto before_end = offers_list.end();
+	before_end--;
+	auto before_begin = offers_list.begin();
+	before_begin--;
+	for (auto it = before_end; it != before_begin; --it) {
+		cout << it->price << endl;
+	}
+	cout << endl;
 
 
 	return 0;
