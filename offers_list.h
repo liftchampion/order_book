@@ -20,18 +20,38 @@
 #include <string_view>
 #include <cmath>
 #include <utility>
+#include <array>
+
+class OffersList;
+
+std::ostream& operator<<(std::ostream& os, OffersList& offers_list);
 
 class OffersList {
+public:
+	struct Offer;
+	class iterator;
+
+	explicit OffersList() = default;
+	int			operator[](double price) const;
+	int&		operator[](double price);
+	void		rebuild();
+	bool 		set_offset(double new_offset);
+	bool 		set_step(double new_step);
+	bool		empty() const;
+	void		clear();
+	void		shrink_to_fit();
+	iterator	begin();
+	iterator	end();
+private:
+	struct OfferData;
+	using lst_iter = decltype(std::forward_list<OfferData>().begin());
 public:
 	struct Offer {
 		explicit Offer(double price);
 		const double	price;
 		int				amount = 0;
 	};
-private:
-	struct OfferData;
-	using lst_iter = decltype(std::forward_list<OfferData>().begin());
-public:
+
 	class iterator : public std::iterator<std::bidirectional_iterator_tag, OfferData>
 	{
 	public:
@@ -46,23 +66,16 @@ public:
 		void		next();
 	private:
 		lst_iter		*ptr;
-		const lst_iter	lst_end;
 		const lst_iter	*end;
+		const lst_iter	lst_end;
 	};
-public:
-	explicit OffersList() = default;
-	int			operator[](double price) const;
-	int&		operator[](double price);
-	iterator	begin();
-	iterator	end();
-	void		rebuild();
 private:
-	inline auto					subscript_helper(double price) const;
+	inline std::array<bool, 3>	subscript_helper(double price) const;
 	std::pair<double, double>	find_min_step_offset_and_rm_empty(lst_iter no_del_iter);
 	void 						rebuild_(lst_iter no_del_if_empty);
 	inline bool					need_rebuild(double price) const;
-	inline bool					check_price_by_step(double price) const;
-	inline size_t				get_idx_by_price(double price) const;
+	bool						check_price_by_step(double price) const;
+	size_t						get_idx_by_price(double price) const;
 	static double				get_step_by_price(double price);
 	static int					last_digit_before_decimal_point(std::string_view number_str);
 	static int					last_digit_after_decimal_point(std::string_view number_str);
@@ -84,5 +97,3 @@ private:
 		friend class OffersList;
 	};
 };
-
-std::ostream& operator<<(std::ostream& os, OffersList& offers_list);

@@ -34,19 +34,37 @@ int main()
 
 	//offers_list[-1] = 0;
 
+	offers_list[61.20] = 201;
+	offers_list[64.42] = 1;
+	offers_list[50] = 11;
+
+	offers_list[1231.2] = 333;
+	offers_list[1231.2] = 33003;
+	offers_list[121.2] = 33663;
+	offers_list[131.2] = 33993;
+	offers_list[1266631.2] = 33333;
+	offers_list[100.2] = 331243;
+
+
 	cout << offers_list << endl;
 
-//	cout << offers_list << endl;
+	offers_list[1266631.2] = 0;
 
-//	offers_list[1231.2] = 333;
-//	offers_list[1231.2] = 33003;
-//	offers_list[121.2] = 33663;
-//	offers_list[131.2] = 33993;
-//	offers_list[1266631.2] = 33333;
-//	offers_list[100.2] = 331243;
+	offers_list.shrink_to_fit();
 
-	//cout << OffersList::get_step_by_price(-10060000) << endl;
+	cout << offers_list << endl;
 
-//	cout << offers_list << endl;
+	cout << offers_list.empty() << endl;
+	cout << offers_list.set_offset(10) << endl;
+
+	offers_list.clear();
+
+	cout << offers_list.empty() << endl;
+	cout << offers_list.set_offset(10) << endl;
+
+	offers_list[10] = 100;
+
+	cout << offers_list << endl;
+
 	return 0;
 }

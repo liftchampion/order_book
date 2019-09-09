@@ -28,6 +28,7 @@ OffersList::iterator	OffersList::iterator::operator++() {
 }
 
 OffersList::iterator	OffersList::iterator::operator++(int junk) {
+	junk = 0;
 	iterator ret = *this;
 	next();
 	return ret;
