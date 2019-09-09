@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <iostream>
+#include <iomanip>
 #include "offers_list_class.h"
 #include "offers_list_iterators.h"
 #include "reverser.h"
@@ -31,6 +32,10 @@ bool 		OffersList::set_step(double new_step) {
 	}
 	step = new_step;
 	return true;
+}
+
+double 		OffersList::get_step() const{
+	return step;
 }
 
 bool		OffersList::empty() const {
@@ -56,7 +61,9 @@ ostream&					operator<<(ostream& os, const OffersList& offers_list){
 	for (auto [price, amount] : reverse(offers_list)) {
 		if (!is_first) { cout << endl; }
 		if (is_first) { is_first = false; }
-		cout << fixed << price << " | " << amount;
+		int prec = static_cast<int>(lround(-log10(offers_list.get_step())));
+		prec = prec >= 0 ? prec : 0;
+		cout << fixed << setprecision(prec) << price << " | " << amount;
 	}
 	return os;
 }
