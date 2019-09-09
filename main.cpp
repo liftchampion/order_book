@@ -19,8 +19,12 @@ int main()
 //	offers_list[1266631.2] = 33333;
 //	offers_list[100.2] = 331243;
 
+	std::forward_list<int>						offers_list;
+	std::vector<decltype(offers_list.begin())>	idx_to_offer_iter;
 
-	cout << OffersList::get_step_by_price(-10060000) << endl;
+	idx_to_offer_iter.resize(100, offers_list.end()); // todo important!
+
+	//cout << OffersList::get_step_by_price(-10060000) << endl;
 
 //	cout << offers_list << endl;
 	return 0;

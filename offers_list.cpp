@@ -30,7 +30,7 @@ int OffersList::last_digit_before_decimal_point(string_view number_str) {
 	return idx;
 }
 
-int OffersList::first_digit_after_decimal_point(string_view number_str) {
+int OffersList::last_digit_after_decimal_point(string_view number_str) {
 	int idx = PRECISION;
 
 	for (auto i = number_str.rbegin(); i != number_str.rend() && *i == '0'; ++i) {
@@ -47,47 +47,104 @@ double OffersList::get_step_by_price(double price){
 	const int	decimal_point_pos =
 			find(number_str.begin(), number_str.end(), '.') - number_str.begin();
 	int			first_digit_after_point =
-			first_digit_after_decimal_point(string_view(number_str).substr(decimal_point_pos + 1));
+					last_digit_after_decimal_point(string_view(number_str).substr(
+											   decimal_point_pos + 1));
 	if (first_digit_after_point) {
 		return pow(0.1, first_digit_after_point);
 	}
-	return pow(10, last_digit_before_decimal_point(string_view(number_str).substr(0, decimal_point_pos)));
+	return pow(10,
+			last_digit_before_decimal_point(string_view(number_str).substr(
+										0, decimal_point_pos)));
 }
 
-void OffersList::check_and_rebuild_if_needed(double price){
+inline size_t OffersList::get_idx_by_price(double price) const{
+	return static_cast<size_t>((price - offset) / step);
+}
+
+pair<double, double> OffersList::find_min_step_offset_and_rm_empty(lst_iter no_del_iter) {
+	double		min_offset = numeric_limits<double>::infinity();
+	double		min_step   = numeric_limits<double>::infinity();
+	lst_iter	curr_it;
+
+	for (auto it = offers_list.before_begin(); next(it) != offers_list.end();) {
+		if ((curr_it = next(it)) != no_del_iter && curr_it->amount == 0) {
+			offers_list.erase_after(it);
+		} else {
+			if (min_offset > curr_it->price) { min_offset = curr_it->price; }
+			if (min_step   > curr_it->step ) { min_step   = curr_it->step; }
+			++it;
+		}
+	}
+	return make_pair(min_offset, min_step);
+}
+
+void OffersList::rebuild_(lst_iter no_del_if_empty) {
+	const auto new_offset_step = find_min_step_offset_and_rm_empty(no_del_if_empty);
+	if (offers_list.empty()) {
+		offset = INIT_VAL;
+		step   = INIT_VAL;
+		return;
+	}
+	offset = new_offset_step.first;
+	step   = new_offset_step.second;
+	int idx;
+	idx_to_offer_iter.clear();
+	for (auto offer_it = offers_list.begin(); offer_it != offers_list.end(); ++offer_it ) {
+		if ((idx = get_idx_by_price(offer_it->price)) >= idx_to_offer_iter.size()) {
+			idx_to_offer_iter.resize(idx + 1, offers_list.end());
+		}
+		idx_to_offer_iter[idx] = offer_it;
+	}
+}
+
+inline bool OffersList::check_price_by_step(double price) const {
+	double quotient = price / step;
+	return (fabs(quotient - rint(quotient)) < EPSILON);
+}
+
+inline bool		OffersList::need_rebuild(double price) const {
+
+	if (offset != INIT_VAL && offset - price >= EPSILON) {
+		return true;
+	}
+	if (step != INIT_VAL && !check_price_by_step(price)) {
+		return true;
+	}
+	return false;
+}
+
+inline void OffersList::subscript_helper(double price, bool& can_fit, bool& present) const {
 	if (!isfinite(price)) {
 		throw domain_error("Price shouldn't be ±inf or NaN");
 	}
-	if (offset == INIT_VAL || step == INIT_VAL) {
-		offset = price;
-	}
-//	if (price - offset <= -numeric_limits<double>::epsilon() * offset) {
-//		throw domain_error(
-//				"Price should be greater or equal than offset (" + where + ")");
-//	}
-//	double quotient = price / step;
-//	if (fabs(quotient - rint(quotient)) >=
-//		numeric_limits<double>::epsilon() * quotient) {
-//		throw domain_error(
-//				"Price should be multiply of step (" + where + ")");
-//	}
+	int	 idx;
+	bool fit;
+
+	can_fit = !need_rebuild(price);
+	fit     = can_fit ? (idx = get_idx_by_price(price)) < idx_to_offer_iter.size() : false;
+	present = fit ? idx_to_offer_iter[idx] != offers_list.end() : false;
 }
 
-//int OffersList::operator[](double price) const {
-//	check_and_rebuild_if_needed(price, "in operator[]");
-//	int idx = static_cast<int>((price - offset) / step);
-//	if (idx_to_offer_iter.size() <= idx) {
-//		return 0;
-//	}
-//	return idx_to_offer_iter[idx];
-//}
+int OffersList::operator[](double price) const {
+	bool can_fit;
+	bool present;
+
+	subscript_helper(price, can_fit, present);
+
+	return present ? idx_to_offer_iter[get_idx_by_price(price)]->amount : 0;
+}
 int& OffersList::operator[](double price){
-	check_and_rebuild_if_needed(price);
-	int idx = static_cast<int>((price - offset) / step);
-	if (idx_to_offer_iter.size() <= idx) {
-		idx_to_offer_iter.resize(idx + 1, 0);
+	bool can_fit;
+	bool present;
+
+	subscript_helper(price, can_fit, present);
+	if (!present) {
+		offers_list.emplace_front(price, get_step_by_price(price));
+		if (!can_fit) {
+			rebuild_(offers_list.begin());
+		}
 	}
-	return idx_to_offer_iter[idx];
+	return idx_to_offer_iter[get_idx_by_price(price)]->amount;
 }
 
 //OffersList::iterator OffersList::begin() {
