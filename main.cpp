@@ -5,20 +5,23 @@ using namespace std;
 
 int main()
 {
-	OffersList order_book(60, 0.1);
-	cout << order_book << endl;
+//	OffersList offers_list(60, 0.1);
+//	cout << offers_list << endl;
 
-	order_book[61.20] = 20000;
+//	offers_list[61.20] = 20000;
 
-	cout << order_book << endl;
+//	cout << offers_list << endl;
 
-	order_book[1231.2] = 333;
-	order_book[1231.2] = 33003;
-	order_book[121.2] = 33663;
-	order_book[131.2] = 33993;
-	order_book[1266631.2] = 33333;
-	order_book[100.2] = 331243;
+//	offers_list[1231.2] = 333;
+//	offers_list[1231.2] = 33003;
+//	offers_list[121.2] = 33663;
+//	offers_list[131.2] = 33993;
+//	offers_list[1266631.2] = 33333;
+//	offers_list[100.2] = 331243;
 
-	cout << order_book << endl;
+
+	cout << OffersList::get_step_by_price(-10060000) << endl;
+
+//	cout << offers_list << endl;
 	return 0;
 }
