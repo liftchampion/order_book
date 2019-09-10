@@ -14,6 +14,7 @@
 #include <string_view>
 #include <sstream>
 #include <iomanip>
+#include <algorithm>
 
 using namespace std;
 
